@@ -20,33 +20,38 @@ tentacles move independently.
 
 ## Step 1 - Add Customers as a Gradle Dependency
 
-Add the Modrinth Maven repository to the `repositories` block in `build.gradle`:
+Add the CurseForge Maven repository to the `repositories` block in
+`build.gradle`:
 
-See [build.gradle](build.gradle#L20).
+[build.gradle](build.gradle#L20)
 
 ```groovy
 repositories {
     exclusiveContent {
         forRepository {
             maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
+                name = "CurseForge"
+                url = "https://minecraft.curseforge.com/api/maven/"
+                metadataSources {
+                    artifact()
+                }
             }
         }
         filter {
-            includeGroup "maven.modrinth"
+            includeGroup "customers"
         }
     }
 }
 ```
 
-Then add Customers to the `dependencies` block. Replace
-`REPLACE_WITH_CUSTOMERS_VERSION_ID` with the version ID shown on the Customers
-version page:
+CurseForge derives Maven coordinates from the uploaded filename. For
+`customers-neoforge-1.21.1-1.6.1.jar`, use `customers` as the group,
+`customers-neoforge` as the artifact, `1.21.1` as the Maven version, and `1.6.1`
+as the classifier:
 
 ```groovy
 dependencies {
-    compileOnly "maven.modrinth:customers:REPLACE_WITH_CUSTOMERS_VERSION_ID"
+    compileOnly "customers:customers-neoforge:1.21.1:1.6.1"
 }
 ```
 
@@ -55,24 +60,15 @@ Customers into your mod or automatically adding it to the development runtime.
 Install the Customers JAR in your development run directory's `mods` folder, just
 as a player installs it in a Minecraft instance.
 
-While Customers 1.6.1 is under Modrinth review, this repository compiles against
-the locally built JAR:
-
-```groovy
-compileOnly files(
-        "../build/libs/customers-neoforge-1.21.1-1.6.1.jar"
-)
-```
-
-Once the release is approved, replace this temporary declaration with the
-Modrinth declaration above.
+CurseForge does not provide a POM for this filename-derived artifact, so
+`metadataSources { artifact() }` tells Gradle to resolve the JAR directly.
 
 ## Step 2 - Declare Customers as a Required Mod
 
 Add a required dependency to
 `src/main/templates/META-INF/neoforge.mods.toml`:
 
-See [neoforge.mods.toml](src/main/templates/META-INF/neoforge.mods.toml#L55).
+[neoforge.mods.toml](src/main/templates/META-INF/neoforge.mods.toml#L55)
 
 ```toml
 [[dependencies.${mod_id}]]
@@ -111,7 +107,7 @@ Returning `null` from an optional sound method tells Customers to retain its
 default Villager sound. Bobbers does not override sounds, so it only needs
 `getName()` and `isApplicable()`.
 
-See [BobberAppearance.java](src/main/java/com/example/customers/appearance/BobberAppearance.java#L10).
+[BobberAppearance.java](src/main/java/com/example/customers/appearance/BobberAppearance.java#L10)
 
 ```java
 public final class BobberAppearance
@@ -145,7 +141,7 @@ Handle NeoForge's `RegisterEvent` and register the appearance in
 bus. The appearance ID registered here must be the same ID used by the
 client-side appearance registration.
 
-See [BobberAppearanceEvents.java](src/main/java/com/example/customers/appearance/BobberAppearanceEvents.java#L9).
+[BobberAppearanceEvents.java](src/main/java/com/example/customers/appearance/BobberAppearanceEvents.java#L9)
 
 ```java
 @EventBusSubscriber(modid = CustomersAppearanceExample.MODID)
@@ -207,14 +203,14 @@ public final class BobberClientAppearance
 
 Your renderer is going to be specific to your appearance.
 
-[BobberRenderer.java](src/main/java/com/example/customers/appearance/client/BobberRenderer.java#L11).
+[BobberRenderer.java](src/main/java/com/example/customers/appearance/client/BobberRenderer.java#L11)
 
 ## Step 7 - Register the Client Pieces
 
 During the renderer-registration event, associate the same appearance ID registered in
 Step 5 with the client appearance factory.
 
-[BobberClientEvents.java](src/main/java/com/example/customers/appearance/client/BobberClientEvents.java#L18).
+[BobberClientEvents.java](src/main/java/com/example/customers/appearance/client/BobberClientEvents.java#L18)
 
 ```java
 @EventBusSubscriber(
@@ -358,7 +354,7 @@ Add the translation key returned by `BobberAppearance.getName()` to your
 language file. This is the name Customers displays beside the appearance
 checkbox in Customer and Supplier Spawner screens.
 
-[en_us.json](src/main/resources/assets/customersappearanceexample/lang/en_us.json#L1).
+[en_us.json](src/main/resources/assets/customersappearanceexample/lang/en_us.json#L1)
 
 ```json
 {
