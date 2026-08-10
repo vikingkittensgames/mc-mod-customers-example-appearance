@@ -1,0 +1,32 @@
+{
+  "bobber_ambient": {
+    "sounds": [
+      "customersappearanceexample:bobber-ambient"
+    ]
+  },
+  "bobber_death": {
+    "sounds": [
+      "customersappearanceexample:bobber-death"
+    ]
+  },
+  "bobber_hurt": {
+    "sounds": [
+      "customersappearanceexample:bobber-hurt"
+    ]
+  },
+  "bobber_no": {
+    "sounds": [
+      "customersappearanceexample:bobber-no"
+    ]
+  },
+  "bobber_step": {
+    "sounds": [
+      "customersappearanceexample:bobber-step"
+    ]
+  },
+  "bobber_yes": {
+    "sounds": [
+      "customersappearanceexample:bobber-yes"
+    ]
+  }
+}
