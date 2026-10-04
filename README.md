@@ -18,50 +18,39 @@ tentacles move independently.
 
 ![bobbers.png](screenshots/bobbers.png)
 
-## Step 1 - Add Customers as a Gradle Dependency
+## Step 1 - Add Customers and Architectury API as Gradle Dependencies
 
-Add the CurseForge Maven repository to the `repositories` block in
-`build.gradle`:
+Add Architectury's Maven repository and construct the local Customers NeoForge
+production JAR path from the configured Minecraft and Customers versions:
 
 [build.gradle](build.gradle#L20)
 
 ```groovy
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "CurseForge"
-                url = "https://minecraft.curseforge.com/api/maven/"
-                metadataSources {
-                    artifact()
-                }
-            }
-        }
-        filter {
-            includeGroup "customers"
-        }
+    maven {
+        name = "Architectury"
+        url = "https://maven.architectury.dev/"
     }
 }
 ```
 
-CurseForge derives Maven coordinates from the uploaded filename. For
-`customers-neoforge-1.21.1-1.6.1.jar`, use `customers` as the group,
-`customers-neoforge` as the artifact, `1.21.1` as the Maven version, and `1.6.1`
-as the classifier:
-
 ```groovy
+def customersJar = file(
+        "../neoforge/build/libs/customers-neoforge-${minecraft_version}-${customers_version}.jar"
+)
+
 dependencies {
-    compileOnly "customers:customers-neoforge:1.21.1:1.6.1"
+    compileOnly files(customersJar)
+    localRuntime files(customersJar)
+    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 ```
 
-`compileOnly` makes the Customers API available to the compiler without bundling
-Customers into your mod or automatically adding it to the development runtime.
-Install the Customers JAR in your development run directory's `mods` folder, just
-as a player installs it in a Minecraft instance.
-
-CurseForge does not provide a POM for this filename-derived artifact, so
-`metadataSources { artifact() }` tells Gradle to resolve the JAR directly.
+`compileOnly` exposes the Customers API without bundling Customers.
+`localRuntime` installs the same JAR in development runs. Replace the local file
+dependency with published Maven coordinates when consuming a released Customers
+API. Architectury must remain an explicit dependency because Customers uses its
+cross-loader appearance registry.
 
 ## Step 2 - Declare Customers as a Required Mod
 
@@ -75,13 +64,14 @@ Add a required dependency to
     modId="customers"
     type="required"
     reason="This mod adds a Customers appearance."
-    versionRange="[1.6.1,)"
+    versionRange="[2.0.0,)"
     ordering="AFTER"
     side="BOTH"
 ```
 
 The common appearance definition is needed on both logical sides. Models and
-renderers belong in client-only packages.
+renderers belong in client-only packages. Declare Architectury API as a required
+dependency as shown in this project's metadata.
 
 ## Step 3 - Your Appearance Specific Implementation Pieces
 
@@ -107,6 +97,13 @@ Returning `null` from an optional sound method tells Customers to retain its
 default Villager sound. Bobbers does not override sounds, so it only needs
 `getName()` and `isApplicable()`.
 
+Contextual appearances may also use `getCustomersLevel()` and
+`getCustomersSpawnerPosition()` while the logical server selects an appearance.
+Override `getAdditionalProperties(CustomersVillager)` to return immutable
+appearance-specific key-value pairs. Customers saves and synchronizes those
+properties, and renderers can read them later through
+`CustomersVillager.getAdditionalProperties()`.
+
 [BobberAppearance.java](src/main/java/com/example/customers/appearance/BobberAppearance.java#L10)
 
 ```java
@@ -115,13 +112,13 @@ public final class BobberAppearance
     public static final ResourceLocation ID =
             ResourceLocation.fromNamespaceAndPath(
                     CustomersAppearanceExample.MODID,
-                    bobbers
+                    "bobbers"
             );
 
     @Override
     public Component getName() {
         return Component.translatable(
-                appearance.customersappearanceexample.bobbers
+                "appearance.customersappearanceexample.bobbers"
         );
     }
 
@@ -135,28 +132,17 @@ public final class BobberAppearance
 
 ## Step 5 - Register the Customers Appearance
 
-Handle NeoForge's `RegisterEvent` and register the appearance in
-`CustomersVillagerAppearance.APPEARANCE_REGISTRY_KEY`. The example does this in
-`BobberAppearanceEvents`, which is automatically subscribed to the mod event
-bus. The appearance ID registered here must be the same ID used by the
-client-side appearance registration.
+Register the appearance through Customers' Architectury-backed registry during
+your mod's initialization. The appearance ID registered here must be the same ID
+used by the client-side appearance registration.
 
-[BobberAppearanceEvents.java](src/main/java/com/example/customers/appearance/BobberAppearanceEvents.java#L9)
+[CustomersAppearanceExample.java](src/main/java/com/example/customers/appearance/CustomersAppearanceExample.java#L1)
 
 ```java
-@EventBusSubscriber(modid = CustomersAppearanceExample.MODID)
-public final class BobberAppearanceEvents {
-    private BobberAppearanceEvents() {}
-
-    @SubscribeEvent
-    public static void registerAppearances(RegisterEvent event) {
-        event.register(
-                CustomersVillagerAppearance.APPEARANCE_REGISTRY_KEY,
-                registry -> registry.register(
-                        BobberAppearance.ID,
-                        new BobberAppearance()
-                )
-        );
+@Mod(CustomersAppearanceExample.MODID)
+public final class CustomersAppearanceExample {
+    public CustomersAppearanceExample() {
+        CustomersVillagerAppearanceRegistries.appearances().register(BobberAppearance.ID, BobberAppearance::new);
     }
 }
 ```

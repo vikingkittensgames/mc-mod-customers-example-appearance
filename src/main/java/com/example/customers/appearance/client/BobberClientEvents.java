@@ -13,6 +13,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 import com.example.customers.appearance.BobberAppearance;
 import com.example.customers.appearance.CustomersAppearanceExample;
+
 import com.vikingkittens.mc.customers.client.appearance.CustomersVillagerClientAppearances;
 
 @EventBusSubscriber(

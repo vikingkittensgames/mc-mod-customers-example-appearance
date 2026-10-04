@@ -5,12 +5,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import com.mojang.math.Axis;
-
-import net.minecraft.core.Direction;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -18,12 +18,10 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Mob;
 
 import com.vikingkittens.mc.customers.appearance.CustomersVillagerType;
-
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 public final class BobberModel<T extends Mob>
         extends EntityModel<T> {

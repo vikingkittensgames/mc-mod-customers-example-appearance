@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 import com.example.customers.appearance.CustomersAppearanceExample;
+
 import com.vikingkittens.mc.customers.customer.CustomerVillagerEntity;
 
 public final class BobberRenderer

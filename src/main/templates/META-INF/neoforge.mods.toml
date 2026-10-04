@@ -92,7 +92,15 @@ Example Appearance for the Customers mod - https://www.curseforge.com/minecraft/
     modId="customers"
     type="required"
     reason="The Bobbers appearance extends the Customers appearance API."
-    versionRange="[1.6.1,)"
+    versionRange="${customers_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="architectury"
+    type="required"
+    reason="Customers uses Architectury API for its cross-loader appearance registry."
+    versionRange="${architectury_version_range}"
     ordering="AFTER"
     side="BOTH"
 
