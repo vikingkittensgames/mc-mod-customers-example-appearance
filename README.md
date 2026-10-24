@@ -64,7 +64,7 @@ Add a required dependency to
     modId="customers"
     type="required"
     reason="This mod adds a Customers appearance."
-    versionRange="[2.0.0,)"
+    versionRange="[2.1.0,)"
     ordering="AFTER"
     side="BOTH"
 ```
